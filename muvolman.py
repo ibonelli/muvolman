@@ -2,9 +2,18 @@ import os
 import sys
 
 class DirTree(object):
+  lastdid=0
   def __init__(self,dirpath,parent=None):
+    self.did = DirTree.lastdid
+    DirTree.lastdid+=1
     self.dirpath = dirpath
     self.parent = parent
+    if(parent==None):
+      self.pdid = None
+      print('d,'+str(self.did)+',None,'+self.dirpath)
+    else:
+      self.pdid = self.parent.did
+      print('d,'+str(self.did)+','+str(self.pdid)+','+os.path.basename(self.dirpath))
     self.dirs = []
     self.files = []
     self.size = None
@@ -26,6 +35,24 @@ class DirTree(object):
     return self.files
   def get_name(self):
     return os.path.basename(self.dirpath)
+  def print_self(self):
+    print('--self--')
+    print('d,'+str(self.did)+','+str(self.pdid)+','+os.path.basename(self.dirpath))
+  def print_dirs(self):
+    print('--dirs--')
+    for d in self.dirs:
+      print('d,'+str(d.did)+','+str(d.pdid)+','+os.path.basename(d.dirpath))
+  def print_subdirs(self):
+    print('--subdirs--')
+    for d in self.dirs:
+      d.print_self()
+      d.print_dirs()
+      d.print_files()
+      d.print_subdirs()
+  def print_files(self):
+    print('--files--')
+    for f,size in self.files:
+      print('f,'+str(self.did)+','+f+','+str(size))
 
 if(__name__ == '__main__'):
   if(len(sys.argv) < 2):
@@ -33,12 +60,11 @@ if(__name__ == '__main__'):
     exit(-1)
   else:
     root = DirTree(sys.argv[1])
-    print('dirs:')
-    for mydir in root.list_dirs():
-      print(mydir.get_name())
-    print('files:')
-    for f,size in root.list_files():
-      print(f+','+str(size))
+    print('----main.print()----')
+    root.print_self()
+    root.print_dirs()
+    root.print_files()
+    root.print_subdirs()
 
 # COMO LISTO SUBDIRS?
 # Se estan creando los subdirs?
