@@ -10,49 +10,64 @@ class DirTree(object):
     self.parent = parent
     if(parent==None):
       self.pdid = None
-      print('d,'+str(self.did)+',None,'+self.dirpath)
     else:
       self.pdid = self.parent.did
-      print('d,'+str(self.did)+','+str(self.pdid)+','+os.path.basename(self.dirpath))
     self.dirs = []
     self.files = []
     self.size = None
+    self.du = None
     self.walk_self(self.dirpath)
   def append_child_dirs(self,mydir,parent=None):
     self.dirs.append(DirTree(mydir,parent))
-  def append_child_files(self,myfile,size=None):
-    self.files.append((myfile,size))
+  def append_child_files(self,myfile,size=None,du=None):
+    self.files.append((myfile,size,du))
   def walk_self(self,startpath):
     for f in os.listdir(startpath):
       filefullpath = os.path.join(startpath,f)
       if(os.path.isfile(filefullpath)):
-        self.append_child_files(f,os.stat(filefullpath).st_size)
+        fst = os.stat(filefullpath)
+        self.append_child_files(f,fst.st_size,fst.st_blocks*512)
       if(os.path.isdir(filefullpath)):
         self.append_child_dirs(filefullpath,self)
-  def list_dirs(self):
-    return self.dirs
-  def list_files(self):
-    return self.files
   def get_name(self):
     return os.path.basename(self.dirpath)
   def print_self(self):
-    print('--self--')
-    print('d,'+str(self.did)+','+str(self.pdid)+','+os.path.basename(self.dirpath))
+    #print('--self--')
+    if(self.parent==None):
+      print('d,'+str(self.did)+',root,'+self.dirpath+','+str(self.size)+','+str(self.du))
+    else:
+      print('d,'+str(self.did)+','+str(self.pdid)+','+os.path.basename(self.dirpath)+','+str(self.size)+','+str(self.du))
   def print_dirs(self):
-    print('--dirs--')
+    #print('--dirs--')
     for d in self.dirs:
       print('d,'+str(d.did)+','+str(d.pdid)+','+os.path.basename(d.dirpath))
   def print_subdirs(self):
-    print('--subdirs--')
+    #print('--subdirs--')
     for d in self.dirs:
       d.print_self()
-      d.print_dirs()
       d.print_files()
       d.print_subdirs()
   def print_files(self):
-    print('--files--')
-    for f,size in self.files:
-      print('f,'+str(self.did)+','+f+','+str(size))
+    #print('--files--')
+    for f,size,du in self.files:
+      print('f,'+str(self.did)+','+f+','+str(size)+','+str(du))
+  def calc_sizes(self):
+    for d in self.dirs:
+      d.calc_sizes()
+    total = 0
+    totaldu = 0
+    for f in self.files:
+      total+=f[1]
+      totaldu+=f[2]
+    for d in self.dirs:
+      total+=d.size
+      totaldu+=d.du
+    self.size=total
+    self.du=totaldu
+  def show_tree(self):
+    print self.dirpath
+    for d in self.dirs:
+      d.show_tree()
 
 if(__name__ == '__main__'):
   if(len(sys.argv) < 2):
@@ -60,12 +75,10 @@ if(__name__ == '__main__'):
     exit(-1)
   else:
     root = DirTree(sys.argv[1])
-    print('----main.print()----')
+    root.calc_sizes()
+    print('---tree---')
+    root.show_tree()
+    print('---listing---')
     root.print_self()
-    root.print_dirs()
     root.print_files()
     root.print_subdirs()
-
-# COMO LISTO SUBDIRS?
-# Se estan creando los subdirs?
-# Necesito averiguar sobre childs...
