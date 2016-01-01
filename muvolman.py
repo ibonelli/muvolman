@@ -1,35 +1,45 @@
 import os
 import sys
 
-class Directorio(object)
-  def __init__(self,name,dirpath,parent):
+class DirTree(object):
+  def __init__(self,dirpath,parent=None):
     self.dirpath = dirpath
     self.parent = parent
     self.dirs = []
     self.files = []
     self.size = None
-  def append_child_dirs(self,mydir):
-    self.dirs.append(Directorio(mydir,os.path.join(self.dirpath,mydir)))
+    self.walk_self(self.dirpath)
+  def append_child_dirs(self,mydir,parent=None):
+    self.dirs.append(DirTree(mydir,parent))
   def append_child_files(self,myfile,size=None):
-    self.children.files.append((myfile,size))
+    self.files.append((myfile,size))
+  def walk_self(self,startpath):
+    for f in os.listdir(startpath):
+      filefullpath = os.path.join(startpath,f)
+      if(os.path.isfile(filefullpath)):
+        self.append_child_files(f,os.stat(filefullpath).st_size)
+      if(os.path.isdir(filefullpath)):
+        self.append_child_dirs(filefullpath,self)
   def list_dirs(self):
-    print self.children.dirs
+    return self.dirs
   def list_files(self):
-    print self.children.files
+    return self.files
+  def get_name(self):
+    return os.path.basename(self.dirpath)
 
 if(__name__ == '__main__'):
   if(len(sys.argv) < 2):
     print('Malos datos de entrada')
     exit(-1)
   else:
-    mypath = sys.argv[1]
-    for root, dirs, files in os.walk(mypath, topdown=True):
-      if(mypath == root):
-        mydir = Directorio(mypath,root,None)
-      else
-        mydir = Directorio(os.path.basename(root),root,None)
+    root = DirTree(sys.argv[1])
+    print('dirs:')
+    for mydir in root.list_dirs():
+      print(mydir.get_name())
+    print('files:')
+    for f,size in root.list_files():
+      print(f+','+str(size))
 
-      for name in files:
-        mydir.append_child_files(name,None)
-      for name in dirs:
-        mydir.append_child_dirs(name)
+# COMO LISTO SUBDIRS?
+# Se estan creando los subdirs?
+# Necesito averiguar sobre childs...
