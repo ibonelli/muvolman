@@ -1,6 +1,22 @@
 import os
 import sys
 
+class CurDir(object):
+  def __init__(self,dirpath,dirtreeref=None):
+    self.dirpath = dirpath
+    self.dirtreeref = dirtreeref
+    self.dirs = []
+    self.files = []
+    if(dirtreeref==None):
+      for f in os.listdir(dirpath):
+        if(os.path.isfile(os.path.join(dirpath,f))):
+          self.files.append((f,os.stat(dirpath).st_size()))
+        if(os.path.isdir(os.path.join(startpath,f))):
+          self.dirs.append((f,None))
+    else:
+      self.dirs = dirtreeref.get_dirs()
+      self.files = dirtreeref.get_files()
+
 class DirTree(object):
   lastdid=0
   def __init__(self,dirpath,parent=None):
@@ -73,6 +89,16 @@ class DirTree(object):
     for d in self.dirs:
       dirlist.append(d)
     return dirlist
+  def get_dirs(self):
+    dirlist = []
+    for d in self.dirs:
+      dirlist.append((os.path.basename(d.dirpath),self))
+    return dirlist
+  def get_files(self):
+    filelist = []
+    for f,size,du in self.files:
+      filelist.append((f,size))
+    return filelist
   def serialize_self(self):
     if(self.parent==None):
       return ('d,'+str(self.did)+','+self.dirpath+',root,'+str(self.size)+','+str(self.du))
@@ -88,4 +114,3 @@ class DirTree(object):
     for f,size,du in self.files:
       filelist.append('f,'+str(self.did)+','+f+','+str(size)+','+str(du))
     return filelist
-

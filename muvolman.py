@@ -2,6 +2,7 @@ import os
 import sys
 import pickle
 from dirtree import DirTree
+from dirtree import CurDir
 
 if(__name__ == '__main__'):
   if(len(sys.argv) < 2):
@@ -23,6 +24,12 @@ if(__name__ == '__main__'):
     print('---tree2---')
     for curdir in list_dirs:
       curdir.print_self()
+    print('---CurDir---')
+    mycurdir = CurDir(list_dirs[0].dirpath,list_dirs[0])
+    for d,ref in mycurdir.dirs:
+      print("["+d+"]")
+    for f,size in mycurdir.files:
+      print(f+" ("+str(size)+")")
     #print('---listing---')
     #list_dirs[0].print_self()
     #list_dirs[0].print_files()
