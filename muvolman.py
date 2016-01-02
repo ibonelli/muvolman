@@ -1,5 +1,6 @@
 import os
 import sys
+import pickle
 
 class DirTree(object):
   lastdid=0
@@ -68,6 +69,19 @@ class DirTree(object):
     print self.dirpath
     for d in self.dirs:
       d.show_tree()
+  def get_tree(self):
+    dirlist = []
+    dirlist.append(self)
+    for d in self.dirs:
+      dirlist.append(d)
+    return dirlist
+  def serialize_self(self):
+    return ('d,'+str(self.did)+','+self.dirpath+','+str(self.pdid)+','+str(self.size)+','+str(self.du))
+  def serialize_file(self):
+    filelist = []
+    for f,size,du in self.files:
+      filelist.append('f,'+str(self.did)+','+f+','+str(size)+','+str(du))
+    return filelist
 
 if(__name__ == '__main__'):
   if(len(sys.argv) < 2):
@@ -76,9 +90,24 @@ if(__name__ == '__main__'):
   else:
     root = DirTree(sys.argv[1])
     root.calc_sizes()
-    print('---tree---')
-    root.show_tree()
-    print('---listing---')
-    root.print_self()
-    root.print_files()
-    root.print_subdirs()
+    print('---Saving---')
+    mylist = root.get_tree()
+    for l in mylist:
+      print(l.serialize_self())
+    output = open('data.pkl', 'wb')
+    pickle.dump(mylist, output)
+    output.close()
+    print('---Loading---')
+    pkl_file = open('data.pkl', 'rb')
+    list_dirs = pickle.load(pkl_file)
+    # Works
+    #for l in list_dirs:
+    #  print(l.serialize_self())
+    # Trying
+    list_dirs[0].show_tree()
+    #print('---tree---')
+    #root.show_tree()
+    #print('---listing---')
+    #root.print_self()
+    #root.print_files()
+    #root.print_subdirs()
