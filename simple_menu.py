@@ -15,10 +15,8 @@ class cMenu(object):
     # Setting up colors to us
     self.color["normal"] = curses.A_NORMAL
     self.color["bold"] = curses.A_BOLD
-    curses.init_pair(1,curses.COLOR_WHITE,curses.COLOR_BLUE) # Sets up color pair #1
-    self.color["basic"] = curses.color_pair(1)
-    curses.init_pair(2,curses.COLOR_BLACK,curses.COLOR_CYAN) # Sets up color pair #2
-    self.color["highlighted"] = curses.color_pair(2)
+    curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
+    self.color["highlighted"] = curses.color_pair(1)
   def add_menu_entry(self,option,cmd):
     self.menu.append((option,cmd))
   def show(self):
@@ -43,7 +41,7 @@ class cMenu(object):
       if self.pos==i:
         usecolor = self.color["highlighted"]
       else:
-        usecolor = self.color["basic"]
+        usecolor = self.color["normal"]
       self.screen.addstr(i+1, 4, opt, usecolor)
       i+=1
   def upKey(self):

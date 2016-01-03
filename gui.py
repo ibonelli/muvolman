@@ -1,9 +1,19 @@
 from simple_menu import cMenu
+from gui_mc import guiMc
+from gui_vol import guiVolumes
 
 menu = cMenu()
-menu.add_menu_entry("1. Opcion1","cmd1")
-menu.add_menu_entry("2. Opcion2","cmd2")
-menu.add_menu_entry("3. Opcion3","cmd3")
+menu.add_menu_entry("1. Crear un volumen","cvol")
+menu.add_menu_entry("2. Ver un volumen","svol")
+menu.add_menu_entry("3. Salir","exit")
 cmd = menu.show()
 menu.cleanup()
-print cmd
+
+if(cmd=="cvol"):
+  svol = guiVolumes()
+  svol.show()
+  svol.cleanup()
+elif(cmd=="svol"):
+  mgm = guiMc()
+  mgm.show()
+  mgm.cleanup()
