@@ -9,9 +9,10 @@ class CurDir(object):
     self.files = []
     if(dirtreeref==None):
       for f in os.listdir(dirpath):
-        if(os.path.isfile(os.path.join(dirpath,f))):
-          self.files.append((f,os.stat(dirpath).st_size()))
-        if(os.path.isdir(os.path.join(startpath,f))):
+        fullpath = os.path.join(dirpath,f)
+        if(os.path.isfile(fullpath)):
+          self.files.append((f,os.stat(fullpath).st_size))
+        if(os.path.isdir(os.path.join(dirpath,f))):
           self.dirs.append((f,None))
     else:
       self.dirs = dirtreeref.get_dirs()

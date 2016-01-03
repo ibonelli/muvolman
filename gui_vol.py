@@ -1,10 +1,15 @@
 import curses, os
+from dirtree import CurDir
+import string_format as stringFormat
 
 class guiVolumes(object):
   pos = 0
   winheight = 20
   winwidth = 60
   color = {}
+  entries = []
+  entriescnt = 0
+  curdir = None
 
   def __init__(self):
     # init ncurses
@@ -18,6 +23,9 @@ class guiVolumes(object):
     self.color["basic"] = curses.color_pair(1)
     curses.init_pair(2,curses.COLOR_BLACK,curses.COLOR_CYAN) # Sets up color pair #2
     self.color["highlighted"] = curses.color_pair(2)
+    # init path
+    self.curdir = os.getcwd()
+    self.fillentries()
 
   def win(self):
     begin_x = 1; begin_y = 1
@@ -25,6 +33,24 @@ class guiVolumes(object):
     w1v = self.screen.subwin(height, width, begin_y, begin_x)
     w1v.bkgdset(' ',self.color["basic"])
     w1v.border()
+    for i in xrange(height-2):
+      if(i<self.entriescnt):
+        if self.pos==i:
+          w1v.addstr(begin_y+i, begin_x, self.entries[i], self.color["highlighted"])
+        else:
+          w1v.addstr(begin_y+i, begin_x, self.entries[i], self.color["basic"])
+      else:
+        w1v.addstr(begin_y+i, begin_x, stringFormat.getfstr(self.winwidth-2,""), self.color["basic"])
+
+  def fillentries(self):
+    self.entriescnt = 0
+    mycurdir = CurDir(self.curdir)
+    for d,ref in mycurdir.dirs:
+      self.entries.append(stringFormat.getfstr(self.winwidth-2,d,"dir"))
+      self.entriescnt+=1
+    for f,size in mycurdir.files:
+      self.entries.append(stringFormat.getfstr(self.winwidth-2,(f,size),"file"))
+      self.entriescnt+=1
 
   def show(self):
     self.win()
