@@ -1,5 +1,6 @@
 import curses, os
 from dirtree import CurDir
+from gui_fixedlist import guiFixedList
 import string_format as stringFormat
 
 class guiVolumes(object):
@@ -10,6 +11,7 @@ class guiVolumes(object):
   entries = []
   entriescnt = 0
   curdir = None
+  view = None
 
   def __init__(self):
     # init ncurses
@@ -26,6 +28,7 @@ class guiVolumes(object):
     # init path
     self.curdir = os.getcwd()
     self.fillentries()
+    self.view = guiFixedList(self.entries,(winheight-2,winwidth-2))
 
   def draw_win(self):
     begin_x = 1; begin_y = 1
@@ -33,14 +36,12 @@ class guiVolumes(object):
     w1v = self.screen.subwin(height, width, begin_y, begin_x)
     w1v.bkgdset(' ',self.color["basic"])
     w1v.border()
-    for i in xrange(height-2):
-      if(i<self.entriescnt):
-        if self.pos==i:
-          w1v.addstr(begin_y+i, begin_x, self.entries[i], self.color["highlighted"])
-        else:
-          w1v.addstr(begin_y+i, begin_x, self.entries[i], self.color["basic"])
+    self.pos = self.view.get_view(self.pos)
+    for v in self.view:
+      if self.pos==i:
+        w1v.addstr(begin_y+i, begin_x, self.view[i], self.color["highlighted"])
       else:
-        w1v.addstr(begin_y+i, begin_x, stringFormat.getfstr(self.winwidth-2,""), self.color["basic"])
+        w1v.addstr(begin_y+i, begin_x, self.view[i], self.color["basic"])
     self.screen.addstr(begin_y+self.winheight, begin_x, "Para seleccionar presione \"S\"", self.color["normal"])
 
   def fillentries(self):
@@ -56,28 +57,18 @@ class guiVolumes(object):
   def show(self):
     self.screen.keypad(1)
     stay = True
+    self.draw_win()
     while stay:
-      self.draw_win()
       c = self.screen.getch() # Gets user input
       if(c==curses.KEY_UP):
-        self.upKey()
+        self.pos-=1
+        self.draw_win()
       elif(c==curses.KEY_DOWN):
-        self.downKey()
+        self.pos+=1
+        self.draw_win()
       elif(c==ord('\n')):
         stay = False
     return self.entries[self.pos-1]
-
-  def upKey(self):
-      if self.pos > 0:
-          self.pos -= 1
-      else:
-          self.pos = len(self.entries)
-
-  def downKey(self):
-      if self.pos < len(self.entries):
-          self.pos += 1
-      else:
-          self.pos = 0
 
   def cleanup(self):
     curses.endwin() #VITAL! This closes out the menu system and returns you to the bash prompt.
