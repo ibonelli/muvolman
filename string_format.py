@@ -6,16 +6,16 @@ def convertbh(size):
     return str(size)
   # Kbytes
   elif(size<1024*1024):
-    return dformat(size/1024)+"K"
+    return dformat(size/1024.0)+"K"
   # Mbytes
   elif(size<1024*1024*1024):
-    return dformat(size/(1024*1024))+"M"
+    return dformat(size/(1024.0*1024.0))+"M"
   # Gbytes
   else:
-    return dformat(size/(1024*1024*1024))+"G"
+    return dformat(size/(1024.0*1024.0*1024.0))+"G"
 
 def dformat(x):
-  return ('%.2f' % x).rstrip('0').rstrip('.')
+  return ('%.1f' % x).rstrip('0').rstrip('.')
 
 # string format for fixed size
 
