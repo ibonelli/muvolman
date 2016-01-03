@@ -27,7 +27,7 @@ class guiVolumes(object):
     self.curdir = os.getcwd()
     self.fillentries()
 
-  def win(self):
+  def draw_win(self):
     begin_x = 1; begin_y = 1
     height = self.winheight; width = self.winwidth
     w1v = self.screen.subwin(height, width, begin_y, begin_x)
@@ -41,6 +41,7 @@ class guiVolumes(object):
           w1v.addstr(begin_y+i, begin_x, self.entries[i], self.color["basic"])
       else:
         w1v.addstr(begin_y+i, begin_x, stringFormat.getfstr(self.winwidth-2,""), self.color["basic"])
+    self.screen.addstr(begin_y+self.winheight, begin_x, "Para seleccionar presione \"S\"", self.color["normal"])
 
   def fillentries(self):
     self.entriescnt = 0
@@ -53,9 +54,30 @@ class guiVolumes(object):
       self.entriescnt+=1
 
   def show(self):
-    self.win()
     self.screen.keypad(1)
-    x = self.screen.getch() # Gets user input
+    stay = True
+    while stay:
+      self.draw_win()
+      c = self.screen.getch() # Gets user input
+      if(c==curses.KEY_UP):
+        self.upKey()
+      elif(c==curses.KEY_DOWN):
+        self.downKey()
+      elif(c==ord('\n')):
+        stay = False
+    return self.entries[self.pos-1]
+
+  def upKey(self):
+      if self.pos > 0:
+          self.pos -= 1
+      else:
+          self.pos = len(self.entries)
+
+  def downKey(self):
+      if self.pos < len(self.entries):
+          self.pos += 1
+      else:
+          self.pos = 0
 
   def cleanup(self):
     curses.endwin() #VITAL! This closes out the menu system and returns you to the bash prompt.
