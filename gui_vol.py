@@ -1,7 +1,6 @@
 import curses, os
 from dirtree import CurDir
 from gui_fixedlist import guiFixedList
-import string_format as stringFormat
 
 class guiVolumes(object):
   pos = 0
