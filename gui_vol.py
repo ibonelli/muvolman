@@ -36,11 +36,13 @@ class guiVolumes(object):
     w1v.bkgdset(' ',self.color["basic"])
     w1v.border()
     self.pos = self.view.get_view(self.pos)
+    i=0
     for v in self.view:
       if self.pos==i:
         w1v.addstr(begin_y+i, begin_x, self.view[i], self.color["highlighted"])
       else:
         w1v.addstr(begin_y+i, begin_x, self.view[i], self.color["basic"])
+      i+=1
     self.screen.addstr(begin_y+self.winheight, begin_x, "Para seleccionar presione \"S\"", self.color["normal"])
 
   def fillentries(self):
